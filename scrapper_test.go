@@ -74,7 +74,7 @@ func TestGetInvestorsExceptional(t *testing.T) {
 		in  []string
 		out []Investor
 	}{
-		{[]string{""}, []Investor{}},
+		{[]string{}, []Investor{}},
 		{[]string{"random one", "random two"}, []Investor{}},
 		{[]string{"ANDREESSEN HOROWITZ", "random"}, []Investor{{
 				Name:   "ANDREESSEN HOROWITZ",
