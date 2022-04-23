@@ -1,6 +1,10 @@
 package cypherhunterscrapper
 
-import "testing"
+import (
+	"fmt"
+	"log"
+	"testing"
+)
 
 func TestErrorsGetInvestorsAll(t *testing.T) {
 	// TableDriver https://github.com/golang/go/wiki/TableDrivenTests
@@ -45,8 +49,22 @@ func TestGetInvestorsAll(t *testing.T) {
 		t.Errorf("got %v, expected >= 5", len(investors))
 	}
 
+	if len(investors) > 10 {
+		t.Errorf("got %v, expected <= 10", len(investors))
+	}
+
 	if !contains(investors, "Electric Capital") {
 		t.Error("expected Electric Capital in investors")
 	}
+}
 
+func ExampleGetInvestorsAll() {
+	coinUrl := "https://www.cypherhunter.com/en/p/ethereum/"
+	investors, err := GetInvestorsAll(coinUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	fmt.Printf("%#v", investors)
+	// []string{"Wavemaker Genesis", "KR1", "Electric Capital", "Breyer Capital", "8 Decimal Capital", "PANTERA Capital"}
 }

@@ -50,9 +50,9 @@ func GetInvestorsAll(coinUrl string) ([]string, error) {
 		aa := divInvestors.FindAll("a")
 		var investorsAll = make([]string, len(aa))
 
-		for _, a := range aa {
+		for i, a := range aa {
 			investorName := a.Attrs()["title"]
-			investorsAll = append(investorsAll, investorName)
+			investorsAll[i] = investorName
 
 		}
 		return investorsAll, nil
