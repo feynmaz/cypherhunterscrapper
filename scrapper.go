@@ -7,7 +7,7 @@ import (
 	"github.com/anaskhan96/soup"
 )
 
-// Investor is how the cypherhunterscrapper package stores an information about the investor 
+// Investor is how the cypherhunterscrapper package stores an information about the investor
 type Investor struct {
 	Name   string
 	Link   string

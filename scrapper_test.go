@@ -64,7 +64,7 @@ func ExampleGetInvestorsAll() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	fmt.Printf("%#v", investors)
-	// []string{"Wavemaker Genesis", "KR1", "Electric Capital", "Breyer Capital", "8 Decimal Capital", "PANTERA Capital"}
+	// Output: []string{"Wavemaker Genesis", "KR1", "Electric Capital", "Breyer Capital", "8 Decimal Capital", "PANTERA Capital"}
 }
