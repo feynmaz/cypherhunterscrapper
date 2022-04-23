@@ -6,33 +6,49 @@ import (
 	"testing"
 )
 
-func TestErrorsGetInvestorsAll(t *testing.T) {
-	// TableDriver https://github.com/golang/go/wiki/TableDrivenTests
-	var testCases = []struct {
-		in        string
-		errorText string
-	}{
-		{"http://bad_url", "couldn't perform GET request to http://bad_url"},
-		{"https://www.cypherhunter.com/en/p/bitcoins/", "that page doesn't exist"},
-		{"https://www.cypherhunter.com/en/p/bitcoin/", "no information about investors for Bitcoin"},
+func TestGetInvestorsAllBadUrl(t *testing.T) {
+	coinUrl := "http://bad_url"
+	_, err := GetInvestorsAll(coinUrl)
+
+	if err == nil {
+		t.Errorf("expected error on %v", coinUrl)
 	}
-
-	for _, c := range testCases {
-		_, err := GetInvestorsAll(c.in)
-
-		if err == nil {
-			t.Errorf("expected error on input %v", c.in)
-		}
-
-		if err.Error() != c.errorText {
-			t.Errorf("got %v, expected %v", err.Error(), c.errorText)
-		}
-	}
-
 }
 
-func TestGetInvestorsAll(t *testing.T) {
+func TestGetInvestorsAllNoPage(t *testing.T) {
+	coinUrl := "https://www.cypherhunter.com/en/p/non-existent-endpoint/"
+	_, err := GetInvestorsAll(coinUrl)
 
+	if err == nil {
+		t.Errorf("expected error on %v", coinUrl)
+	}
+}
+
+func TestGetInvestorsAllNoInvestors(t *testing.T) {
+	coinUrl := "https://www.cypherhunter.com/en/p/bitcoin/"
+	_, err := GetInvestorsAll(coinUrl)
+
+	if err == nil {
+		t.Errorf("expected error on %v", coinUrl)
+	}
+}
+
+func TestGetInvestorsAllOk(t *testing.T) {
+	coinUrl := "https://www.cypherhunter.com/en/p/ethereum/"
+	investors, _ := GetInvestorsAll(coinUrl)
+
+	l := len(investors)
+	maxL := 10
+	minL := 5
+
+	if l > maxL {
+		t.Errorf("got len %v expected less than %v", l, maxL)
+	}
+	if l < minL {
+		t.Errorf("got len %v expected more than %v", l, minL)
+	}
+
+	expectedIn := "Electric Capital"
 	contains := func(s []string, e string) bool {
 		for _, a := range s {
 			if a == e {
@@ -41,20 +57,8 @@ func TestGetInvestorsAll(t *testing.T) {
 		}
 		return false
 	}
-
-	in := "https://www.cypherhunter.com/en/p/ethereum/"
-	investors, _ := GetInvestorsAll(in)
-
-	if len(investors) < 5 {
-		t.Errorf("got %v, expected >= 5", len(investors))
-	}
-
-	if len(investors) > 10 {
-		t.Errorf("got %v, expected <= 10", len(investors))
-	}
-
-	if !contains(investors, "Electric Capital") {
-		t.Error("expected Electric Capital in investors")
+	if !contains(investors, expectedIn) {
+		t.Errorf("expected %v in investors", expectedIn)
 	}
 }
 
@@ -77,25 +81,24 @@ func TestGetInvestorsExceptional(t *testing.T) {
 		{[]string{}, []Investor{}},
 		{[]string{"random one", "random two"}, []Investor{}},
 		{[]string{"ANDREESSEN HOROWITZ", "random"}, []Investor{{
-				Name:   "ANDREESSEN HOROWITZ",
-				Link:   "https://www.cypherhunter.com/en/p/andreessen-horowitz/",
-				Tier:   "Premier",
-				TierId: 0,
-			},
+			Name:   "ANDREESSEN HOROWITZ",
+			Link:   "https://www.cypherhunter.com/en/p/andreessen-horowitz/",
+			Tier:   "Premier",
+			TierId: 0,
+		},
 		}},
 		{[]string{"ANDREESSEN HOROWITZ", "SOLANA"}, []Investor{{
-				Name:   "ANDREESSEN HOROWITZ",
-				Link:   "https://www.cypherhunter.com/en/p/andreessen-horowitz/",
-				Tier:   "Premier",
-				TierId: 0,
-			},{
-				Name:   "SOLANA",
-				Link:   "https://www.cypherhunter.com/en/p/solana/",
-				Tier:   "First",
-				TierId: 1,
-			},
+			Name:   "ANDREESSEN HOROWITZ",
+			Link:   "https://www.cypherhunter.com/en/p/andreessen-horowitz/",
+			Tier:   "Premier",
+			TierId: 0,
+		}, {
+			Name:   "SOLANA",
+			Link:   "https://www.cypherhunter.com/en/p/solana/",
+			Tier:   "First",
+			TierId: 1,
+		},
 		}},
-		
 	}
 
 	areEqual := func(a, b []Investor) bool {
