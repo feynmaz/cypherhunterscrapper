@@ -6,7 +6,8 @@ import (
 	"strings"
 )
 
-// ValidateUrl checks if input url is valid cypherhunter.com url and trims it using https://pkg.go.dev/strings#TrimSpace
+// ValidateUrl checks if input url is valid cypherhunter.com url and trims it using https://pkg.go.dev/strings#TrimSpace.
+//
 // Returns trimmed url and nil error if url is valid else nil and error
 func ValidateUrl(rawUrl string) (string, error) {
 	url := strings.TrimSpace(rawUrl)

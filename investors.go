@@ -1,7 +1,28 @@
 package cypherhunterscrapper
 
-// Investors is the list of all top invstors
-var Investors = []Investor{
+// Investor is how the cypherhunterscrapper package stores an information about the investor
+type Investor struct {
+	Name   string
+	Link   string
+	Tier   string
+	TierId int
+}
+
+// InListOfTop gives Investor if passed name is in list of top investors. Is prefered to be used in Comma Ok Idiom.
+// 
+// Returns Investor and bool meaning that the name is on the list of top investors.
+func InListOfTop(name string) (Investor, bool) {
+	for _, i := range topInvestors {
+		if i.Name == name {
+			return i, true
+		}
+	}
+	return Investor{}, false
+}
+
+
+// investors is the list of all top invstors
+var topInvestors = []Investor{
 	{
 		Name:   "PANTERA Capital",
 		Link:   "https://www.cypherhunter.com/en/p/pantera-capital/",

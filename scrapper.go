@@ -2,21 +2,15 @@ package cypherhunterscrapper
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/anaskhan96/soup"
 )
 
-// Investor is how the cypherhunterscrapper package stores an information about the investor
-type Investor struct {
-	Name   string
-	Link   string
-	Tier   string
-	TierId int
-}
-
-// GetInvestorsAll shows list of all investors of the coin described on the page available by coinUrl
-// Returns array of string with investor names and error that can be nil
+// GetInvestorsAll gives list of all investors of the coin described on the page available by coinUrl.
+//
+// Returns array of string with investor names and possibly nil error
 func GetInvestorsAll(coinUrl string) ([]string, error) {
 
 	resp, err := soup.Get(coinUrl)
@@ -57,4 +51,26 @@ func GetInvestorsAll(coinUrl string) ([]string, error) {
 		}
 		return investorsAll, nil
 	}
+}
+
+// GetInvestorsExceptional finds top investors in list of investors names.
+// 
+// Returns possibly empty list of top investors of type Investor
+func GetInvestorsExceptional(investors []string) []Investor {
+	if len(investors) == 0 {
+		return []Investor{}
+	}
+	var topInvestors []Investor
+
+	for _, name := range investors {
+		i, ok := InListOfTop(name)
+		if ok {
+			topInvestors = append(topInvestors, i)
+		}
+	}
+
+	if len(topInvestors) > 0 {
+		sort.Slice(topInvestors, func(i, j int) bool { return topInvestors[i].TierId < topInvestors[j].TierId })
+	}
+	return topInvestors
 }
