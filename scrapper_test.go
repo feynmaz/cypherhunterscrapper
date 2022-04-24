@@ -2,44 +2,59 @@ package cypherhunterscrapper
 
 import (
 	"fmt"
-	"log"
 	"testing"
+
+	"github.com/stretchr/testify/mock"
 )
 
-func TestGetInvestorsAllBadUrl(t *testing.T) {
-	coinUrl := "http://bad_url"
-	_, err := GetInvestorsAll(coinUrl)
+type RequesterMockedObject struct {
+	mock.Mock
+}
 
+func (m *RequesterMockedObject) Request() (string, error) {
+	args := m.Called()
+	return args.String(0), args.Error(1)
+}
+
+func Test_GetInvestorsAllBadUrl(t *testing.T) {
+	testObj := new(RequesterMockedObject)
+	testObj.On("Request").Return("", fmt.Errorf("Bad url"))
+
+	_, err := GetInvestorsAll(testObj)
 	if err == nil {
-		t.Errorf("expected error on %v", coinUrl)
+		t.Errorf("expected error")
 	}
 }
 
-func TestGetInvestorsAllNoPage(t *testing.T) {
-	coinUrl := "https://www.cypherhunter.com/en/p/non-existent-endpoint/"
-	_, err := GetInvestorsAll(coinUrl)
+func Test_GetInvestorsAllNoPage(t *testing.T) {
+	testObj := new(RequesterMockedObject)
+	testObj.On("Request").Return("<div>Oops! That page doesn't exist.</div>", nil)
 
+	_, err := GetInvestorsAll(testObj)
 	if err == nil {
-		t.Errorf("expected error on %v", coinUrl)
+		t.Errorf("expected error")
 	}
 }
 
-func TestGetInvestorsAllNoInvestors(t *testing.T) {
-	coinUrl := "https://www.cypherhunter.com/en/p/bitcoin/"
-	_, err := GetInvestorsAll(coinUrl)
+func Test_GetInvestorsAllNoInvestors(t *testing.T) {
+	testObj := new(RequesterMockedObject)
+	testObj.On("Request").Return("<h1>Bitcoin</h1><h2>Bitcoin Related</h2>", nil)
 
+	_, err := GetInvestorsAll(testObj)
 	if err == nil {
-		t.Errorf("expected error on %v", coinUrl)
+		t.Errorf("expected error")
 	}
 }
 
-func TestGetInvestorsAllOk(t *testing.T) {
-	coinUrl := "https://www.cypherhunter.com/en/p/ethereum/"
-	investors, _ := GetInvestorsAll(coinUrl)
+func Test_GetInvestorsAllOk(t *testing.T) {
+	testObj := new(RequesterMockedObject)
+	testObj.On("Request").Return(`<h1>Ethereum</h1><h2>Ethereum Investors</h2><div><a title="Wavemaker Genesis"></a><a title="Electric Capital"></a><a title="PANTERA Capital"></a></div>`, nil)
+
+	investors, _ := GetInvestorsAll(testObj)
 
 	l := len(investors)
 	maxL := 10
-	minL := 5
+	minL := 2
 
 	if l > maxL {
 		t.Errorf("got len %v expected less than %v", l, maxL)
@@ -62,16 +77,21 @@ func TestGetInvestorsAllOk(t *testing.T) {
 	}
 }
 
-func ExampleGetInvestorsAll() {
-	coinUrl := "https://www.cypherhunter.com/en/p/ethereum/"
-	investors, err := GetInvestorsAll(coinUrl)
-	if err != nil {
-		log.Fatal(err)
-	}
+// func ExampleGetInvestorsAll() {
+// 	coinUrl := "https://www.cypherhunter.com/en/p/ethereum/"
+// 	cr, err := NewCoinRequester(coinUrl)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
 
-	fmt.Printf("%#v", investors)
-	// Output: []string{"Wavemaker Genesis", "KR1", "Electric Capital", "Breyer Capital", "8 Decimal Capital", "PANTERA Capital"}
-}
+// 	investors, err := GetInvestorsAll(cr)
+// 	if err != nil {
+// 		log.Fatal(err)
+// 	}
+
+// 	fmt.Printf("%#v", investors)
+// 	// Output: []string{"Wavemaker Genesis", "KR1", "Electric Capital", "Breyer Capital", "8 Decimal Capital", "PANTERA Capital"}
+// }
 
 func TestGetInvestorsExceptional(t *testing.T) {
 	var testCases = []struct {
@@ -127,10 +147,10 @@ func TestGetInvestorsExceptional(t *testing.T) {
 	}
 }
 
-func ExampleGetInvestorsExceptional() {
-	investorsAll := []string{"PANTERA Capital", "Random Investor", "GBV Capital"}
-	investorsExceprional := GetInvestorsExceptional(investorsAll)
+// func ExampleGetInvestorsExceptional() {
+// 	investorsAll := []string{"PANTERA Capital", "Random Investor", "GBV Capital"}
+// 	investorsExceprional := GetInvestorsExceptional(investorsAll)
 
-	fmt.Printf("%#v", investorsExceprional)
-	// Output: []cypherhunterscrapper.Investor{cypherhunterscrapper.Investor{Name:"PANTERA Capital", Link:"https://www.cypherhunter.com/en/p/pantera-capital/", Tier:"Premier", TierId:0}, cypherhunterscrapper.Investor{Name:"GBV Capital", Link:"https://www.cypherhunter.com/en/p/gbv-capital/", Tier:"First", TierId:1}}
-}
+// 	fmt.Printf("%#v", investorsExceprional)
+// 	// Output: []cypherhunterscrapper.Investor{cypherhunterscrapper.Investor{Name:"PANTERA Capital", Link:"https://www.cypherhunter.com/en/p/pantera-capital/", Tier:"Premier", TierId:0}, cypherhunterscrapper.Investor{Name:"GBV Capital", Link:"https://www.cypherhunter.com/en/p/gbv-capital/", Tier:"First", TierId:1}}
+// }

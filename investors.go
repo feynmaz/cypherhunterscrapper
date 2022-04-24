@@ -10,7 +10,7 @@ type Investor struct {
 
 // InListOfTop gives Investor if passed name is in list of top investors. Is prefered to be used in Comma Ok Idiom.
 // 
-// Returns Investor and bool meaning that the name is on the list of top investors.
+// Returns Investor and bool meaning that the name is on the list of top investors
 func InListOfTop(name string) (Investor, bool) {
 	for _, i := range topInvestors {
 		if i.Name == name {
@@ -21,7 +21,7 @@ func InListOfTop(name string) (Investor, bool) {
 }
 
 
-// investors is the list of all top invstors
+// topInvestors is the list of top invstors
 var topInvestors = []Investor{
 	{
 		Name:   "PANTERA Capital",

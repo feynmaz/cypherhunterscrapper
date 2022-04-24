@@ -8,12 +8,12 @@ import (
 	"github.com/anaskhan96/soup"
 )
 
-// GetInvestorsAll gives list of all investors of the coin described on the page available by coinUrl.
-//
+// GetInvestorsAll gives list of all investors from coin page given by Request() of Requester interface.
+// 
 // Returns array of string with investor names and possibly nil error
-func GetInvestorsAll(coinUrl string) ([]string, error) {
+func GetInvestorsAll(requester Requester) ([]string, error) {
 
-	resp, err := soup.Get(coinUrl)
+	resp, err := requester.Request()
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func GetInvestorsAll(coinUrl string) ([]string, error) {
 }
 
 // GetInvestorsExceptional finds top investors in list of investors names.
-// 
+//
 // Returns possibly empty list of top investors of type Investor
 func GetInvestorsExceptional(investors []string) []Investor {
 	if len(investors) == 0 {

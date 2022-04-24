@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestValidateUrl(t *testing.T) {
+func TestNewCoinRequester(t *testing.T) {
 	// TableDriver https://github.com/golang/go/wiki/TableDrivenTests
 	var tests = []struct {
 		in      string
@@ -20,11 +20,11 @@ func TestValidateUrl(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		url, err := ValidateUrl(tt.in)
+		cr, err := NewCoinRequester(tt.in)
 		isError := err != nil
 
-		if url != tt.url {
-			t.Errorf("got %v, want %v", url, tt.url)
+		if cr.coinUrl != tt.url {
+			t.Errorf("got %v, want %v", cr.coinUrl, tt.url)
 		}
 
 		if isError != tt.isError {
@@ -33,13 +33,12 @@ func TestValidateUrl(t *testing.T) {
 	}
 }
 
-func ExampleValidateUrl() {
+func ExampleNewCoinRequester() {
 	rawUrl := "  https://www.cypherhunter.com/en/p/solana/   "
-	cypherhunerUrl, err := ValidateUrl(rawUrl)
+	cr, err := NewCoinRequester(rawUrl)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(cypherhunerUrl)
-	// Output: https://www.cypherhunter.com/en/p/solana/
+	fmt.Printf("%#v", cr)
+	// Output: cypherhunterscrapper.CoinRequester{coinUrl:"https://www.cypherhunter.com/en/p/solana/"}
 }
