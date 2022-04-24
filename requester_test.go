@@ -3,10 +3,11 @@ package cypherhunterscrapper
 import (
 	"fmt"
 	"log"
+	"strings"
 	"testing"
 )
 
-func TestNewCoinRequester(t *testing.T) {
+func Test_NewCoinRequester(t *testing.T) {
 	// TableDriver https://github.com/golang/go/wiki/TableDrivenTests
 	var tests = []struct {
 		in      string
@@ -31,6 +32,22 @@ func TestNewCoinRequester(t *testing.T) {
 			t.Errorf("got %v, want %v", isError, tt.isError)
 		}
 	}
+}
+
+func Test_Request(t *testing.T) {
+	url := "https://www.cypherhunter.com/en/p/solana/"
+	cr, _ := NewCoinRequester(url)
+
+	res, _ := cr.Request()
+	
+	if !strings.Contains(res, "<html") {
+		t.Errorf("Expected html content")
+	}
+
+	if len(res) < 40 {
+		t.Errorf("Expected long string content")
+	}
+
 }
 
 func ExampleNewCoinRequester() {

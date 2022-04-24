@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestInListOfTop(t *testing.T) {
+func Test_InListOfTop(t *testing.T) {
 	var testCases = []struct {
 		in       string
 		outValue Investor
